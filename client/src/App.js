@@ -1,4 +1,5 @@
 import React from "react";
+import styled from 'styled-components';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import PrivateRoute from './components/PrivateRoute';
 import BubblePage from './components/BubblePage';
@@ -6,8 +7,17 @@ import BubblePage from './components/BubblePage';
 import Login from "./components/Login";
 import "./styles.scss";
 
+const AppStyles = styled.div`
+
+margin: 0 auto;
+background: linear-gradient(230deg, #fff, #ff652f, #ff652f, #ffe400, #ffe400, #14a76c, #14a76c);
+height: 100vh;
+
+`;
+
 function App() {
   return (
+    <AppStyles>
     <Router>
       <div className="App">
       <Switch>
@@ -16,6 +26,7 @@ function App() {
       </Switch>
       </div>
     </Router>
+    </AppStyles>
   );
 }
 

@@ -1,5 +1,17 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axiosWithAuth from "../utils/axiosWithAuth";
+import { makeStyles } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+
+
+const useStyles = makeStyles(theme => ({
+  root: {
+    "& > *": {
+      margin: theme.spacing(1),
+      width: 200
+    }
+  }
+}));
 
 const initialColor = {
   color: "",
@@ -7,9 +19,15 @@ const initialColor = {
 };
 
 const ColorList = ({ colors, updateColors }) => {
+  const classes = useStyles();
   console.log(colors);
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
+  const [createColor, setCreateColor] = useState({
+    code: { hex: "" },
+    color: "",
+    id: Date.now()
+  });
 
   const editColor = color => {
     setEditing(true);
@@ -18,13 +36,52 @@ const ColorList = ({ colors, updateColors }) => {
 
   const saveEdit = e => {
     e.preventDefault();
-    // Make a put request to save your updated color
-    // think about where will you get the id from...
-    // where is is saved right now?
+    axiosWithAuth()
+      .put(`/api/colors/${colorToEdit.id}`, colorToEdit)
+      .then(() => {
+        axiosWithAuth()
+          .get("/api/colors")
+          .then(response => updateColors(response.data))
+          .catch(error => console.log(error));
+        setEditing(false);
+      })
+      .catch(error => console.log(error));
   };
 
   const deleteColor = color => {
-    // make a delete request to delete this color
+    axiosWithAuth()
+      .delete(`/api/colors/${color.id}`)
+      .then(() => {
+        axiosWithAuth()
+          .get("/api/colors")
+          .then(response => updateColors(response.data))
+          .catch(error => console.log(error));
+        setEditing(false);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
+
+  const handleColorSubmit = event => {
+    event.preventDefault();
+    axiosWithAuth()
+      .post("/api/colors", createColor)
+      .then(() => {
+        axiosWithAuth()
+          .get("/api/colors")
+          .then(response => {
+            updateColors(response.data).catch(error => console.log(error));
+          });
+      });
+  };
+
+  const handleColorChange = event => {
+    event.preventDefault();
+    setCreateColor({
+      ...createColor,
+      [event.target.name]: event.target.value
+    });
   };
 
   return (
@@ -34,12 +91,14 @@ const ColorList = ({ colors, updateColors }) => {
         {colors.map(color => (
           <li key={color.color} onClick={() => editColor(color)}>
             <span>
-              <span className="delete" onClick={e => {
-                    e.stopPropagation();
-                    deleteColor(color)
-                  }
-                }>
-                  x
+              <span
+                className="delete"
+                onClick={e => {
+                  e.stopPropagation();
+                  deleteColor(color);
+                }}
+              >
+                x
               </span>{" "}
               {color.color}
             </span>
@@ -82,6 +141,33 @@ const ColorList = ({ colors, updateColors }) => {
       )}
       <div className="spacer" />
       {/* stretch - build another form here to add a color */}
+      <div>
+        <h3>Add a Color</h3>
+        <form onSubmit={handleColorSubmit} className={classes.root} noValidate autoComplete="off">
+          <div>
+            <TextField
+            value={createColor.color}
+            onChange={handleColorChange}
+            type="text"
+            name="color"
+              id="outlined-basic"
+              label="Color Name"
+              variant="outlined"
+            />
+          </div>
+          <div>
+          <TextField
+          value={createColor.code.hex}
+          onChange={event => setCreateColor({...colorToEdit, code: {hex: event.target.value}})}
+          type="text"
+          name="code"
+            id="outlined-basic"
+            label="Hex Code"
+            variant="outlined"
+          />
+        </div>
+        </form>
+      </div>
     </div>
   );
 };

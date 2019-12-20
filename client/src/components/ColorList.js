@@ -71,7 +71,7 @@ const ColorList = ({ colors, updateColors }) => {
         axiosWithAuth()
           .get("/api/colors")
           .then(response => {
-            updateColors(response.data).catch(error => console.log(error));
+            updateColors(response.data);
           });
       });
   };
@@ -166,6 +166,7 @@ const ColorList = ({ colors, updateColors }) => {
             variant="outlined"
           />
         </div>
+        <button type="submit">Create</button>
         </form>
       </div>
     </div>

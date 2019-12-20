@@ -2,6 +2,24 @@ import React, { useState } from "react";
 import axiosWithAuth from "../utils/axiosWithAuth";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
+import styled from 'styled-components';
+
+const ColorListStyles = styled.div`
+
+
+.formDiv {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  form {
+    margin-top: -2px;
+    margin-bottom: 3rem;
+  }
+
+}
+`;
 
 
 const useStyles = makeStyles(theme => ({
@@ -85,8 +103,39 @@ const ColorList = ({ colors, updateColors }) => {
   };
 
   return (
+    <ColorListStyles>
     <div className="colors-wrap">
-      <p>colors</p>
+    <div>
+      <div className="formDiv">
+        <h3>Add a Color</h3>
+        <form onSubmit={handleColorSubmit} className={classes.root} noValidate autoComplete="off">
+          <div>
+            <TextField
+            value={createColor.color}
+            onChange={handleColorChange}
+            type="text"
+            name="color"
+              id="outlined-basic"
+              label="Color Name"
+              variant="outlined"
+            />
+          </div>
+          <div>
+          <TextField
+          value={createColor.code.hex}
+          onChange={event => setCreateColor({...colorToEdit, code: {hex: event.target.value}})}
+          type="text"
+          name="code"
+            id="outlined-basic"
+            label="Hex Code"
+            variant="outlined"
+          />
+        </div>
+        <button type="submit">Create</button>
+        </form>
+      </div>
+    </div>
+    <p>colors</p>
       <ul>
         {colors.map(color => (
           <li key={color.color} onClick={() => editColor(color)}>
@@ -141,35 +190,9 @@ const ColorList = ({ colors, updateColors }) => {
       )}
       <div className="spacer" />
       {/* stretch - build another form here to add a color */}
-      <div>
-        <h3>Add a Color</h3>
-        <form onSubmit={handleColorSubmit} className={classes.root} noValidate autoComplete="off">
-          <div>
-            <TextField
-            value={createColor.color}
-            onChange={handleColorChange}
-            type="text"
-            name="color"
-              id="outlined-basic"
-              label="Color Name"
-              variant="outlined"
-            />
-          </div>
-          <div>
-          <TextField
-          value={createColor.code.hex}
-          onChange={event => setCreateColor({...colorToEdit, code: {hex: event.target.value}})}
-          type="text"
-          name="code"
-            id="outlined-basic"
-            label="Hex Code"
-            variant="outlined"
-          />
-        </div>
-        <button type="submit">Create</button>
-        </form>
-      </div>
+
     </div>
+    </ColorListStyles>
   );
 };
 
